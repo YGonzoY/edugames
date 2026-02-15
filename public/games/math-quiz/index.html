@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Математический квиз</title>
+    <link rel="stylesheet" href="/assets/css/games.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-wrapper math-quiz">
+        <!-- Заголовок игры -->
+        <div class="game-header">
+            <div class="game-info">
+                <h1>Математический квиз</h1>
+                <div class="game-stats">
+                    <div class="stat">
+                        <span class="stat-label">Счёт</span>
+                        <span class="stat-value" id="score">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Вопрос</span>
+                        <span class="stat-value" id="question-counter">1/10</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Время</span>
+                        <span class="stat-value" id="timer">30s</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="new-game">Новая игра</button>
+        </div>
+        
+        <!-- Игровое поле -->
+        <div class="game-area">
+            <!-- Экран с вопросом -->
+            <div class="question-screen" id="question-screen">
+                <div class="question-text" id="question">2 + 2 = ?</div>
+                <div class="answers-grid" id="answers">
+                    <!-- Ответы будут добавлены динамически -->
+                </div>
+            </div>
+            
+            <!-- Экран с результатом -->
+            <div class="result-screen hidden" id="result-screen">
+                <div class="result-icon" id="result-icon">✅</div>
+                <div class="result-text" id="result-text">Правильно!</div>
+                <div class="result-score">+10 очков</div>
+            </div>
+            
+            <!-- Экран завершения игры -->
+            <div class="game-over-screen hidden" id="game-over-screen">
+                <h2>Игра завершена!</h2>
+                <div class="final-score">
+                    <div class="final-score-label">Ваш счёт</div>
+                    <div class="final-score-value" id="final-score">0</div>
+                </div>
+                <div class="final-stats">
+                    <div class="stat">✅ Правильно: <span id="correct-answers">0</span></div>
+                    <div class="stat">❌ Неправильно: <span id="wrong-answers">0</span></div>
+                    <div class="stat">⏱️ Время: <span id="total-time">0</span>с</div>
+                </div>
+                <button class="btn btn-primary" id="play-again">Играть снова</button>
+            </div>
+        </div>
+        
+        <!-- Информация о пользователе -->
+        <div class="game-footer">
+            <div class="user-info" id="user-info">
+                <span class="user-status" id="auth-status">⭕ Не авторизован</span>
+                <span class="save-status" id="save-status"></span>
+            </div>
+        </div>
+    </div>
+    
+    <script src="game.js" type="module"></script>
+</body>
+</html>

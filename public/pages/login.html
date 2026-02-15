@@ -1,0 +1,65 @@
+<div class="page auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Вход в аккаунт</h2>
+                <p>Войдите, чтобы сохранять прогресс в играх</p>
+            </div>
+            
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="identifier" class="form-label">Имя пользователя или Email</label>
+                    <input 
+                        type="text" 
+                        id="identifier" 
+                        name="identifier" 
+                        class="form-input" 
+                        placeholder="user1 или user1@example.com"
+                        required
+                        autocomplete="username"
+                    >
+                    <div class="form-hint">Используйте: user1 / password123</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">Пароль</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="••••••••"
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+                
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember"> 
+                        <span>Запомнить меня</span>
+                    </label>
+                    <a href="#/forgot-password" class="forgot-link">Забыли пароль?</a>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block" id="login-btn">
+                    Войти
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Нет аккаунта? <a href="#/register">Зарегистрироваться</a></p>
+            </div>
+            
+            <div class="demo-accounts">
+                <p>Демо-аккаунты:</p>
+                <div class="demo-buttons">
+                    <button class="demo-btn" data-user="user1">user1</button>
+                    <button class="demo-btn" data-user="demo">demo</button>
+                    <button class="demo-btn" data-user="test">test</button>
+                </div>
+                <small>Пароль для всех: password123</small>
+            </div>
+        </div>
+    </div>
+</div>

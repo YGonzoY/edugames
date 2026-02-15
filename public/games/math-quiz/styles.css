@@ -1,0 +1,228 @@
+/* Стили для игр */
+.game-wrapper {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Заголовок игры */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 30px;
+}
+
+.game-header h1 {
+    font-size: 1.8rem;
+    color: var(--text-color);
+}
+
+.game-stats {
+    display: flex;
+    gap: 30px;
+}
+
+.game-stats .stat {
+    text-align: center;
+}
+
+.game-stats .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    display: block;
+}
+
+.game-stats .stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* Игровая область */
+.game-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    position: relative;
+}
+
+/* Экран вопроса */
+.question-screen {
+    width: 100%;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.question-text {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    border-radius: var(--radius);
+}
+
+.answers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.answer-btn {
+    padding: 20px;
+    font-size: 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.answer-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+/* Экран результата */
+.result-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 40px;
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    text-align: center;
+    animation: popIn 0.3s ease;
+    z-index: 10;
+}
+
+.result-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.result-text {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.result-score {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+}
+
+/* Экран завершения */
+.game-over-screen {
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.game-over-screen h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: var(--primary-color);
+}
+
+.final-score {
+    margin: 30px 0;
+}
+
+.final-score-label {
+    font-size: 1.2rem;
+    color: var(--text-light);
+}
+
+.final-score-value {
+    font-size: 4rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.final-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+/* Подвал игры */
+.game-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.user-info {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.save-status {
+    margin-left: 10px;
+    color: var(--secondary-color);
+}
+
+/* Анимации */
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* Медиа-запросы */
+@media (max-width: 768px) {
+    .game-wrapper {
+        margin: 20px;
+        padding: 15px;
+    }
+    
+    .game-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .game-stats {
+        gap: 15px;
+    }
+    
+    .question-text {
+        font-size: 2rem;
+    }
+    
+    .answers-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .final-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Образовательные игры</title>
+    <!-- Убедитесь, что пути правильные -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+</head>
+<body>
+    <div id="header-container"></div>
+    <main id="app-container">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Загрузка приложения...</p>
+        </div>
+    </main>
+    <div id="modal-container"></div>
+    <div id="notification-container"></div>
+    
+    <script type="module" src="/modules/state.js"></script>
+    <script type="module" src="/modules/api.js"></script>
+    <script type="module" src="/modules/ui.js"></script>
+    <script type="module" src="/modules/router.js"></script>
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>
