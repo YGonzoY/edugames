@@ -14,9 +14,9 @@ class WebServer {
 	
 	this.mimeTypes = {
 	    '.html': 'text/html',
-	    '.css'  : 'text/css',
-	    '.js'   : 'text/javascript',
-	    '.json' : 'application/json',
+	    '.css' : 'text/css',
+	    '.js'  : 'text/javascript',
+	    '.json': 'application/json',
 	    '.png' : 'image/png',
 	    '.jpg' : 'image/jpeg',
 	    '.svg' : 'image/svg+xml',
@@ -129,7 +129,6 @@ class WebServer {
 	try {
 	    console.log('Getting games from database...');
 	    const games = await db.all('SELECT * FROM games ORDER BY id');
-	    console.log(`Found ${games.length} games:`, games);
 
 	    if (!games || games.length === 0) {
 		const demoGames = [
@@ -159,7 +158,6 @@ class WebServer {
     async handleGetGame(req, res, params) {
 	try {
 	    const game = await db.get('SELECT * FROM games WHERE id = ?', [Number(params.id)]);
-
 	    if (!game) {
 		return this.sendError(res, 404, 'game was not found');
 	    }
@@ -171,7 +169,6 @@ class WebServer {
     }
 
     async handleRegister(req, res) {
-	console.log('res in handleRegister is:', res);
 	try {
 	    const body = await this.parseBody(req);
 	    const { username, email, password } = body;
@@ -475,7 +472,7 @@ VALUES (?, ?, ?, ?, 1, ?)
 	    if (route.includes(':')) {
 		const params = this.parseRouteParams(route, pathname);
 		if (params !== null) {
-		    return { handler: routes[route], params: {} };
+		    return { handler: routes[route], params };
 		}
 	    }
 	}

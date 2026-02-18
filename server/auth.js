@@ -8,7 +8,7 @@ class Auth {
 	this.JWT_SECRET = 'your-secret-key-change-in-production';
 	this.JWT_EXPIRES = '7d';
 	this.saltRounds = 10;
-    }
+    }    
 
     async register(username, email, password) {
 	try {

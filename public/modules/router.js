@@ -30,11 +30,9 @@ const Router = (function() {
 	let matchedRoute = null;
 	let routeParams = {};
 
-	console.log('routes:', routes);
-	
 	for (const route in routes) {
 	    const params = matchRoute(route, hash);
-	    console.log('matchRoute result:', params);
+	    
 	    if (params !== null) {
 		matchedRoute = routes[route];
 		routeParams = params;
@@ -51,7 +49,7 @@ const Router = (function() {
     }
 
     function matchRoute(route, path) {
-	console.log('matching', route, 'with', path);
+	
 	const routeParts = route.split('/').filter(p => p !== '');
 	const pathParts = path.split('/').filter(p => p !== '');
 
@@ -70,7 +68,7 @@ const Router = (function() {
 		const paramName = routeParts[i].slice(1);
 		params[paramName] = pathParts[i];
 	    } else if (routeParts[i] !== pathParts[i]) {
-		console.log(`Part ${i} mismatch: ${routeParts[i]} vs ${pathParts[i]}`);
+		//console.log(`Part ${i} mismatch: ${routeParts[i]} vs ${pathParts[i]}`);
 		return null;
 	    }
 	}

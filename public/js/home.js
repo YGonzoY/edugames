@@ -17,24 +17,18 @@ export async function init() {
 async function loadGamesData() {
     const state = AppState.getState();
     
-    // Если игры уже есть в состоянии, используем их
     if (state.games && state.games.length > 0) {
-        console.log('Using cached games:', state.games);
         return state.games;
     }
     
-    // Иначе загружаем с сервера
     try {
         console.log('Fetching games from server...');
-        const games = await API.getGames();
-        console.log('Games fetched:', games);
-        
+        const games = await API.getGames();        
         AppState.setState({ games });
         return games;
     } catch (error) {
         console.error('Failed to load games:', error);
         
-        // Показываем сообщение об ошибке в сетке
         const grid = document.getElementById('games-grid');
         if (grid) {
             grid.innerHTML = `
@@ -143,9 +137,7 @@ function createGameCard(game) {
 	});
     }
 
-    console.log('created game card for', game.title);
-
-	return card;
+    return card;
     } catch (error) {
 	console.error('Error while creating game cardfor', game.title, error);
 	return null;
