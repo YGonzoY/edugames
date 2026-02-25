@@ -62,7 +62,7 @@ const AppState = (function() {
 	    }
 
 	    if (state.games.length > 0) {
-		localeStorage.setItem('eduGames_games', JSON.stringify(state.games));
+		localStorage.setItem('eduGames_games', JSON.stringify(state.games));
 	    }
 	} catch (error) {
 	    console.error('Error saving state to localStorage:', error);

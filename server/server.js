@@ -26,22 +26,39 @@ class WebServer {
 
 	this.routes = {
 	    'GET' : {
-		'/api/health'       : this.handleHealthCheck.bind(this),
-		'/api/games'        : this.handleGetGames.bind(this),
-		'/api/game/:id'     : this.handleGetGame.bind(this),
-		'/api/user/profile' : this.handleGetProfile.bind(this),
-		'/api/user/progress': this.handleGetProgress.bind(this),
-		'/api/user/stats'   : this.handleGetUserStats.bind(this),
+		'/api/health'        : this.handleHealthCheck.bind(this),
+		'/api/games'         : this.handleGetGames.bind(this),
+		'/api/game/:id'      : this.handleGetGame.bind(this),
+		'/api/user/profile'  : this.handleGetProfile.bind(this),
+		'/api/user/progress' : this.handleGetProgress.bind(this),
+		'/api/user/stats'    : this.handleGetUserStats.bind(this),
+		//admin endpoints (to be bind)
+		'/api/admin/users'   : this.handleAdminGetUsers.bind(this), 
+		'/api/admin/games'   : this.handleAdminGetGames.bind(this),
+		'/api/admin/game/:id': this.handleAdminGetGame.bind(this),
+		'/api/admin/user/:id': this.handleAdminGetUser.bind(this),
+		'/api/admin/stats'   : this.handleAdminStats.bind(this)
 	    },
 	    'POST' : {
 		'/api/auth/register'    : this.handleRegister.bind(this),
 		'/api/auth/login'       : this.handleLogin.bind(this),
 		'/api/auth/logout'      : this.handleLogout.bind(this),
-		'/api/game/:id/progress': this.handleSaveProgress.bind(this)
+		'/api/game/:id/progress': this.handleSaveProgress.bind(this),
+		//admin endpoints (to be bind)
+		'/api/admin/games'      : this.handleAdminCreateGame.bind(this),
+		//'/api/admin/users'      : this.handleAdminCreateUser.bind(this),
 	    },
 	    'PUT' : {
-		'/api/user/profile' : this.handleUpdateProfile.bind(this),
-		'/api/user/password': this.handleChangePassword.bind(this)
+		'/api/user/profile'  : this.handleUpdateProfile.bind(this),
+		'/api/user/password' : this.handleChangePassword.bind(this),
+		//admin endpoint (to be bind)
+		'/api/admin/game/:id': this.handleAdminUpdateGame.bind(this),
+		'/api/admin/user/:id': this.handleAdminUpdateUser.bind(this),
+	    },
+	    'DELETE' : {
+		//admin emdpoint (to be bind)
+		'/api/admin/game/:id': this.handleAdminDeleteGame.bind(this),
+		'/api/admin/user/:id': this.handleAdminDeleteUser.bind(this),
 	    }
 	};
     }
@@ -101,16 +118,296 @@ class WebServer {
 	}
     }
 
+    //admin authentication
+    async authenticateAdmin(req, res) {
+        const user = await this.authenticate(req);
+	console.log('authenticateAdmin: user=', user);
+    	if(!user) {
+     	    this.sendError(res, 401, 'Not authorized');
+	    return null;
+	}
+	if (user.role !== 'admin') {
+	    console.log('User role is not admin:', user.role);
+	    this.sendError(res, 403, 'access denied');
+	    return null;
+	}
+	return user;
+    }
+
+    async handleAdminGetGames(req, res) {
+	const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            const games = await db.all('SELECT * FROM games ORDER BY id');
+            this.sendJSON(res, 200, games);
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка получения игр');
+        }
+    }
+
+    async handleAdminGetGame(req, res, params) {
+        const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            const game = await db.get('SELECT * FROM games WHERE id = ?', [params.id]);
+            if (!game) {
+                return this.sendError(res, 404, 'Игра не найдена');
+            }
+            this.sendJSON(res, 200, game);
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка получения игры');
+        }
+    }
+
+    async handleAdminCreateGame(req, res) {
+        const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            const body = await this.parseBody(req);
+            const { title, description, icon, category, difficulty, path, color, status } = body;
+
+            if (!title || !path) {
+                return this.sendError(res, 400, 'Поля title и path обязательны');
+            }
+
+            const result = await db.run(
+                `INSERT INTO games (title, description, icon, category, difficulty, path, color, status)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    title,
+                    description || '',
+                    icon || '🎮',
+                    category || '',
+                    difficulty || 'Начальный',
+                    path,
+                    color || '#3498db',
+                    status || 'planned'
+                ]
+            );
+
+            this.sendJSON(res, 201, { id: result.lastID });
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка создания игры');
+        }
+    }
+
+    async handleAdminUpdateGame(req, res, params) {
+        const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            const body = await this.parseBody(req);
+            const { title, description, icon, category, difficulty, path, color, status } = body;
+
+            // Проверяем, существует ли игра
+            const existing = await db.get('SELECT id FROM games WHERE id = ?', [params.id]);
+            if (!existing) {
+                return this.sendError(res, 404, 'Игра не найдена');
+            }
+
+            await db.run(
+                `UPDATE games SET
+                     title = COALESCE(?, title),
+                     description = COALESCE(?, description),
+                     icon = COALESCE(?, icon),
+                     category = COALESCE(?, category),
+                     difficulty = COALESCE(?, difficulty),
+                     path = COALESCE(?, path),
+                     color = COALESCE(?, color),
+                     status = COALESCE(?, status)
+                 WHERE id = ?`,
+                [
+                    title, description, icon, category, difficulty, path, color, status,
+                    params.id
+                ]
+            );
+
+            this.sendJSON(res, 200, { success: true });
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка обновления игры');
+        }
+    }
+
+    async handleAdminDeleteGame(req, res, params) {
+        const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            // Проверяем существование
+            const existing = await db.get('SELECT id FROM games WHERE id = ?', [params.id]);
+            if (!existing) {
+                return this.sendError(res, 404, 'Игра не найдена');
+            }
+
+            // Сначала удаляем прогресс (если нет каскадного удаления)
+            await db.run('DELETE FROM user_progress WHERE game_id = ?', [params.id]);
+            // Затем игру
+            await db.run('DELETE FROM games WHERE id = ?', [params.id]);
+
+            this.sendJSON(res, 200, { success: true });
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка удаления игры');
+        }
+    }
+
+    async handleAdminGetUsers(req, res) {
+        const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            // Не возвращаем хеши паролей!
+            const users = await db.all('SELECT id, username, email, role, created_at, last_login FROM users ORDER BY id');
+            this.sendJSON(res, 200, users);
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка получения пользователей');
+        }  
+    }
+
+    async handleAdminGetUser(req, res, params) {
+        const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            const user = await db.get(
+                'SELECT id, username, email, role, created_at, last_login FROM users WHERE id = ?',
+                [params.id]
+            );
+            if (!user) {
+                return this.sendError(res, 404, 'Пользователь не найден');
+            }
+            this.sendJSON(res, 200, user);
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка получения пользователя');
+        }
+    }
+
+    async handleAdminUpdateUser(req, res, params) {
+        const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            const body = await this.parseBody(req);
+            const { role, username, email } = body; // разрешим менять и другие поля
+
+            // Проверяем существование
+            const existing = await db.get('SELECT id FROM users WHERE id = ?', [params.id]);
+            if (!existing) {
+                return this.sendError(res, 404, 'Пользователь не найден');
+            }
+
+            // Не даём админу понизить самого себя
+            if (params.id == admin.id && role && role !== 'admin') {
+                return this.sendError(res, 400, 'Нельзя изменить свою собственную роль');
+            }
+
+            await db.run(
+                `UPDATE users SET
+                    username = COALESCE(?, username),
+                    email = COALESCE(?, email),
+                    role = COALESCE(?, role)
+                 WHERE id = ?`,
+                [username, email, role, params.id]
+            );
+
+            this.sendJSON(res, 200, { success: true });
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка обновления пользователя');
+        }
+    }
+
+    async handleAdminDeleteUser(req, res, params) {
+        const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            // Запрещаем удалять самого себя
+            if (params.id == admin.id) {
+                return this.sendError(res, 400, 'Нельзя удалить свою учётную запись');
+            }
+
+            const existing = await db.get('SELECT id FROM users WHERE id = ?', [params.id]);
+            if (!existing) {
+                return this.sendError(res, 404, 'Пользователь не найден');
+            }
+
+            // Удаляем прогресс
+            await db.run('DELETE FROM user_progress WHERE user_id = ?', [params.id]);
+            // Удаляем пользователя
+            await db.run('DELETE FROM users WHERE id = ?', [params.id]);
+
+            this.sendJSON(res, 200, { success: true });
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка удаления пользователя');
+        }
+    }
+
+    async handleAdminStats(req, res) {
+        const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            const totalUsers = await db.get('SELECT COUNT(*) as count FROM users');
+            const totalGames = await db.get('SELECT COUNT(*) as count FROM games');
+            const totalPlays = await db.get('SELECT COUNT(*) as count FROM user_progress');
+            const totalCompleted = await db.get('SELECT COUNT(*) as count FROM user_progress WHERE completed = 1');
+            this.sendJSON(res, 200, {
+                users: totalUsers.count,
+                games: totalGames.count,
+                plays: totalPlays.count,
+                completed: totalCompleted.count
+            });
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка получения статистики');
+        }
+    }
+
+    async handleAdminCreateGame(req, res) {
+        const admin = await this.authenticateAdmin(req, res);
+        if (!admin) return;
+
+        try {
+            const body = await this.parseBody(req);
+            const { title, description, icon, category, difficulty, path, color, status } = body;
+            if (!title || !path) {
+                return this.sendError(res, 400, 'Название и путь обязательны');
+            }
+            const result = await db.run(
+               `INSERT INTO games (title, description, icon, category, difficulty, path, color, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [title, description, icon, category, difficulty, path, color, status || 'planned']
+            );
+            this.sendJSON(res, 201, { id: result.lastID });
+        } catch (error) {
+            console.error(error);
+            this.sendError(res, 500, 'Ошибка создания игры');
+        }
+    }
+
     async authenticate(req) {
 	const authHeader = req.headers['authorization'];
-
+        console.log('Auth header:', authHeader);
 	if (!authHeader || !authHeader.startsWith('Bearer ')) {
+	    console.log('❌ No Bearer token');
 	    return null;
 	}
 
 	const token = authHeader.substring(7);
+	console.log('Token:', token);
 	const user = await auth.getUserFromToken(token);
-
+	console.log('User from token:', user);
 	return user;
     }
 
@@ -166,6 +463,36 @@ class WebServer {
 	} catch (error) {
 	    this.sendError(res, 500, 'error getting game');
 	}
+    }
+
+    async handleAdminGetGames(req, res) {
+	const admin = await this.authenticateAdmin(req, res);
+	if (!admin) return;
+
+	try {
+	    const games = await db.all('SELECT * FROM games ORDER BY id');
+	    this.sendJSON(res, 200, games);
+	} catch (error) {
+	    console.error(error);
+	    this.sendError(res, 500, 'error getting games');
+	}
+    }
+
+    async handleAdminGetUsers(req, res) {
+	const admin = await this.authenticateAdmin(req, res);
+	if (!admin) return;
+
+	try {
+	    const users = await db.all('SELECT id, username, email, role, created_at, last_login FROM users ORDER BY id');
+	    this.sendJSON(res, 200, users);
+	} catch (error) {
+	    console.error(error);
+	    this,sendError(res, 500, 'Error getting users');
+	}
+    }
+
+    async handleAdminStats(req, res) {
+	const admin = await this.authenticateAdmin(req, res);
     }
 
     async handleRegister(req, res) {

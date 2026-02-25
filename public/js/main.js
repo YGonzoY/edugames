@@ -28,7 +28,8 @@ async function loadHeader() {
     
     await UI.renderComponent('header-container', 'header', {
 	isAuthrnticated: !!user,
-	username: user ? user.username : ''
+	username: user ? user.username : '',
+	role: user ? user.role : ''
     });
 }
 
@@ -83,6 +84,7 @@ function setupGlobalListeners() {
     AppState.subscribe((newState, oldState) => {
 	if (newState.user !== oldState.user || newState.games !== oldState.games) {
 	    AppState.saveToStorage();
+	    loadHeader();
 	}
     });
 
@@ -93,7 +95,7 @@ function setupGlobalListeners() {
 
     window.addEventListener('unhandledrejection', (event) => {
 	console.error('unhandled promise rejection:', event.reason);
-	UI.showNotification(`error: ${event.reson.message}`, 'error');
+	UI.showNotification(`error: ${event.reason.message}`, 'error');
     }); 
 }
 

@@ -11,7 +11,7 @@ const API = (function() {
 	};
 
 	if (token) {
-	    headers['Authorisation'] = `Bearer ${token}`;
+	    headers['Authorization'] = `Bearer ${token}`;
 	}
 
 	try {
@@ -30,7 +30,7 @@ const API = (function() {
 	    const data = await response.json();
 
 	    if (!response.ok) {
-		throw new Error(data.error || `Error ${response.ststus}`);
+		throw new Error(data.error || `Error ${response.status}`);
 	    }
 
 	    return data;
@@ -64,10 +64,10 @@ const API = (function() {
         });
     }
 
-    async function login(username, password) {
+    async function login(identifier, password) {
 	return request('/api/auth/login', {
 	    method: 'POST',
-	    body: JSON.stringify({ username, password })
+	    body: JSON.stringify({ identifier, password })
 	});
     }
 
@@ -110,6 +110,51 @@ const API = (function() {
         });
     }
 
+    async function adminGetGames() {
+        return request('/api/admin/games');
+    }
+
+    async function adminCreateGame(data) {
+        return request('/api/admin/games', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async function adminUpdateGame(id, data) {
+        return request(`/api/admin/game/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async function adminDeleteGame(id) {
+        return request(`/api/admin/game/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    async function adminGetUsers() {
+        return request('/api/admin/users');
+    }
+
+    async function adminUpdateUser(id, data) {
+        return request(`/api/admin/users/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+    
+    async function adminDeleteUser(id) {
+        return request(`/api/admin/users/${id}`, {
+             method: 'DELETE'
+        });
+    }
+    
+    async function adminGetStats() {
+        return request('/api/admin/stats');
+    }
+
     function showNotification(message, type = 'info') {
 	const event = new CustomEvent('show-notification', {
 	    detail: { message, type }
@@ -130,7 +175,16 @@ const API = (function() {
         getUserStats,
         saveGameProgress,
         updateProfile,
-        changePassword
+        changePassword,
+	adminGetGames,
+	adminCreateGame,
+	adminCreateGame,
+	adminUpdateGame,
+	adminDeleteGame,
+	adminGetUsers,
+	adminUpdateUser,
+	adminDeleteUser,
+	adminGetStats
     };
 })();
 

@@ -7,7 +7,8 @@ const Router = (function() {
     '/about'     : 'about',
     '/login'     : 'login',
     '/register'  : 'register',
-    '/profile'   : 'profile'
+    '/profile'   : 'profile',
+    '/admin'     : 'admin'
     };
 
     let currentPath = '';

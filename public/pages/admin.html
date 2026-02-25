@@ -1,0 +1,127 @@
+<div class="page admin-page">
+    <h1>Панель управления</h1>
+    
+    <div class="admin-tabs">
+        <button class="tab-btn active" data-tab="games">🎮 Игры</button>
+        <button class="tab-btn" data-tab="users">👥 Пользователи</button>
+        <button class="tab-btn" data-tab="stats">📊 Статистика</button>
+    </div>
+    
+    <div class="tab-content">
+        <!-- Вкладка Игры -->
+        <div class="tab-pane active" id="tab-games">
+            <div class="admin-header">
+                <h2>Управление играми</h2>
+                <button id="add-game-btn" class="btn btn-primary">➕ Добавить игру</button>
+            </div>
+            <table class="admin-table" id="games-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Иконка</th>
+                        <th>Название</th>
+                        <th>Категория</th>
+                        <th>Сложность</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="games-list"></tbody>
+            </table>
+        </div>
+        
+        <!-- Вкладка Пользователи -->
+        <div class="tab-pane" id="tab-users">
+            <h2>Пользователи</h2>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Email</th>
+                        <th>Роль</th>
+                        <th>Зарегистрирован</th>
+                        <th>Последний вход</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="users-list"></tbody>
+            </table>
+        </div>
+        
+        <!-- Вкладка Статистика -->
+        <div class="tab-pane" id="tab-stats">
+            <h2>Общая статистика</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-users">0</div>
+                    <div class="stat-label">Пользователей</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-games">0</div>
+                    <div class="stat-label">Игр</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-plays">0</div>
+                    <div class="stat-label">Сыграно раз</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-completed">0</div>
+                    <div class="stat-label">Пройдено игр</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно для добавления/редактирования игры -->
+    <div id="game-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-title">Добавить игру</h2>
+            <form id="game-form">
+                <input type="hidden" id="game-id">
+                <div class="form-group">
+                    <label>Название</label>
+                    <input type="text" id="game-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea id="game-description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Иконка (эмодзи)</label>
+                    <input type="text" id="game-icon" value="🎮" required>
+                </div>
+                <div class="form-group">
+                    <label>Категория</label>
+                    <input type="text" id="game-category" required>
+                </div>
+                <div class="form-group">
+                    <label>Сложность</label>
+                    <select id="game-difficulty">
+                        <option>Начальный</option>
+                        <option>Средний</option>
+                        <option>Продвинутый</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Путь к игре</label>
+                    <input type="text" id="game-path" placeholder="/games/math-quiz/" required>
+                </div>
+                <div class="form-group">
+                    <label>Цвет (hex)</label>
+                    <input type="color" id="game-color" value="#3498db">
+                </div>
+                <div class="form-group">
+                    <label>Статус</label>
+                    <select id="game-status">
+                        <option value="active">Активна</option>
+                        <option value="in-development">В разработке</option>
+                        <option value="planned">Запланирована</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+</div>

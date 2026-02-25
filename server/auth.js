@@ -104,19 +104,28 @@ class Auth {
 	);
     }
 
+    async isAdmin(token) {
+	const user = await thos.getUserFromToken(token);
+	return user && user.role === 'admin';
+    }
+
     async getUserFromToken(token) {
-	const decoded = this.verifyToken(token);
-
-	if (!decoded || !decoded.id) {
-	    return null;
+	try {
+	    const decoded = this.verifyToken(token);
+	    console.log('Decoded token:', decoded);
+	    if (!decoded || !decoded.id) {
+	        return null;
+	    }
+	    const user = await db.get(
+	        'SELECT id, username, email, role, avatar, created_at, last_login FROM users WHERE id = ?',
+	        [decoded.id]
+	    );
+            console.log('User from DB:', user);
+	    return user;
+	} catch (error) {
+	    console.error('JWT verify error:', error.message);
+            return null;
 	}
-
-	const user = await db.get(
-	    'SELECT id, usrname, email, role, avatar, created_at, last_login FROM users WHERE id = ?',
-	    [decoded.id]
-	);
-
-	return user;
     }
 
     async changePassword(userId, oldPassword, newPassword) {

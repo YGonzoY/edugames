@@ -65,8 +65,13 @@ const UI = (function() {
         if (!userSection) return;
     
         if (data.isAuthenticated && data.username) {
+	    let adminLink = '';
+	    if (data.role === 'admin') {
+		adminLink = '<a href="#/admin" class="nav-link">Admin Page</a>';
+	    }
             userSection.innerHTML = `
             <div class="user-info">
+                ${adminLink}
                 <span class="username">👤 ${data.username}</span>
                 <button id="logout-btn" class="btn btn-small">Выйти</button>
             </div>
