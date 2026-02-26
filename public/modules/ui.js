@@ -107,6 +107,20 @@ const UI = (function() {
     }
 
     async function loadPageScript(pageName, data) {
+    try {
+        const module = await import(`/js/${pageName}.js`);
+        if (module.init) {
+            await module.init(data);
+        } else {
+            console.log(`No init function in ${pageName}.js`);
+        }
+    } catch (error) {
+        console.error(`Error loading script for ${pageName}:`, error);
+    }
+}
+    
+/*
+    async function loadPageScript(pageName, data) {
 	try {
 	    const module = await import(`/js/${pageName}.js`);
 	    if (module.init) {
@@ -116,7 +130,7 @@ const UI = (function() {
 	    console.log('No script for page: ${pageName}');
 	}
     }
-
+*/
     function initComponentEvents(containerId, componentName, data) {
 	const container = document.getElementById(containerId);
 

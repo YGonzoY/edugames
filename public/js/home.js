@@ -71,6 +71,11 @@ async function renderGamesGrid() {
 	const gameCard = createGameCard(game);
 	container.appendChild(gameCard);
     });
+    
+    const countEl = document.getElementById('games-count');
+    if (countEl) {
+        countEl.textContent = games.length;
+    }
 }
 
 function createGameCard(game) {

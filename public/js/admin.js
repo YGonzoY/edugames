@@ -1,28 +1,37 @@
 import API from '../modules/api.js';
 import UI from '../modules/ui.js';
 import AppState from '../modules/state.js';
+import Router from '../modules/router.js';
 
 export async function init() {
-    // Проверяем, что пользователь админ
+    console.log('Admin page init');
+    
     const user = AppState.getState().user;
-    if (!user || user.role !== 'admin') {
-        UI.showNotification('Доступ запрещён', 'error');
-        window.location.hash = '#/';
+
+    if (!user) {
+        Router.goTo('/login?redirect=admin');
         return;
     }
 
-    // Загружаем данные
-    await loadGames();
-    await loadUsers();
-    await loadStats();
+    if (user.role !== 'admin') {
+        UI.showNotification('Доступ запрещён', 'error');
+        Router.goTo('/');
+        return;
+    }
+    
+    try {
+        await Promise.all([
+            loadGames(),
+            loadUsers(),
+            loadStats()
+        ]);
+    } catch (error) {
+        console.error('Error loading admin data:', error);
+        UI.showNotification('Ошибка загрузки данных', 'error');
+    }
 
-    // Настраиваем табы
     setupTabs();
-
-    // Настраиваем модальное окно для игр
     setupGameModal();
-
-    // Кнопка добавления игры
     document.getElementById('add-game-btn').addEventListener('click', () => {
         openGameModal();
     });
